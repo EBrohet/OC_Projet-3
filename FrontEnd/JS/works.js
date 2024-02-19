@@ -24,8 +24,8 @@ afficherProjets(works);
 
 
 // Mise en place des filtres
-const bountonTous = document.querySelector(".btn-tous");
-bountonTous.addEventListener("click", function() {
+const boutonTous = document.querySelector(".btn-tous");
+boutonTous.addEventListener("click", function() {
     const projetsFiltres = works.filter(function(work) {
         return work;  
     });
@@ -33,8 +33,8 @@ bountonTous.addEventListener("click", function() {
     afficherProjets(projetsFiltres);
 });
 
-const bountonObjets = document.querySelector(".btn-objets");
-bountonObjets.addEventListener("click", function() {
+const boutonObjets = document.querySelector(".btn-objets");
+boutonObjets.addEventListener("click", function() {
     const projetsFiltres = works.filter(function(work) {
         if (work.category.id === 1) {
             return work;
@@ -44,8 +44,8 @@ bountonObjets.addEventListener("click", function() {
     afficherProjets(projetsFiltres);
 });
 
-const bountonApparts = document.querySelector(".btn-apparts");
-bountonApparts.addEventListener("click", function() {
+const boutonApparts = document.querySelector(".btn-apparts");
+boutonApparts.addEventListener("click", function() {
     const projetsFiltres = works.filter(function(work) {
         if (work.category.id === 2) {
             return work;
@@ -55,8 +55,8 @@ bountonApparts.addEventListener("click", function() {
     afficherProjets(projetsFiltres);
 });
 
-const bountonHotels = document.querySelector(".btn-hotels");
-bountonHotels.addEventListener("click", function() {
+const boutonHotels = document.querySelector(".btn-hotels");
+boutonHotels.addEventListener("click", function() {
     const projetsFiltres = works.filter(function(work) {
         if (work.category.id === 3) {
             return work;
@@ -65,3 +65,6 @@ bountonHotels.addEventListener("click", function() {
     document.querySelector(".gallery").innerHTML = '';
     afficherProjets(projetsFiltres);
 });
+
+
+
