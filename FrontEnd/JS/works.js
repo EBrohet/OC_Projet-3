@@ -68,3 +68,50 @@ boutonHotels.addEventListener("click", function() {
 
 
 
+// Ajout des éléments du mode édition
+
+function admin() {
+    const bandeauEdition = document.querySelector(".edition");
+    bandeauEdition.innerHTML = '<p><i class="fa-regular fa-pen-to-square"></i>Mode édition</p>';
+    const boutonModifier = document.querySelector(".btn-modifier");
+    boutonModifier.innerHTML = '<i class="fa-regular fa-pen-to-square"></i>modifier';
+    const logout = document.querySelector(".logout");
+    logout.innerHTML = "logout";
+};
+
+// function seConnecter() {
+//     const token = localStorage.getItem('token');
+//     console.log(token);
+//     if(token) {
+//         admin();
+//     };
+// };
+
+// admin();
+
+
+
+// ouverture de la modale
+
+const open = document.querySelector(".btn-modifier");
+const dialog = document.querySelector("dialog");
+const close = document.querySelector(".fermer");
+const modale = document.querySelector(".modale");
+
+modale.innerHTML = `<h3>Galerie photo</h3>
+                    <i class="fa-solid fa-trash-can fa-border"></i>
+                    <hr>
+                    <button class="ajout-photo">Ajouter une photo</button>`;
+
+open.addEventListener("click", () => {
+    dialog.showModal();
+});
+
+close.addEventListener("click", () => {
+    dialog.close();
+});
+
+const ajout = document.querySelector(".ajout-photo");
+ajout.addEventListener("click", function() {
+    modale.innerHTML = ``;
+});
