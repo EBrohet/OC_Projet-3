@@ -2,7 +2,7 @@ const form = document.querySelector("#form");
 form.addEventListener("submit", async function(event) {
     event.preventDefault();
     const identifiantsConnexion = {
-        email:document.querySelector("#email").value,
+        email: document.querySelector("#email").value,
         password: document.querySelector("#password").value
     };   
     const res = await fetch("http://localhost:5678/api/users/login", {
@@ -25,3 +25,4 @@ form.addEventListener("submit", async function(event) {
         console.log("Erreur dans l'identifiant ou le mot de passe");
     }
 })
+
