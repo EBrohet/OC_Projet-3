@@ -6,6 +6,7 @@ const works = await reponse.json();
 
 // Affichage des projets dans le HTML
 function afficherProjets(works) {
+    document.querySelector(".gallery").innerHTML = '';
     for (let i=0; i < works.length; i++) {
         const imageElement = document.createElement("img");
         imageElement.src = works[i].imageUrl;
@@ -109,10 +110,12 @@ modale2.innerHTML = `<p class="btn-fleche"><i class="fa-solid fa-arrow-left"></i
                      <h3>Ajout photo</h3>
                      <form>
                         <div class="photo">
+                        <div>
                             <i class="fa-regular fa-image fa-4x"></i>
                             <label for="photo">+ Ajouter photo</label>
                             <input type="file" id="photo" name="photo" accept=".png, .jpg" required>
                             <p>jpg, png : 4mo max</p>
+                            </div>
                         </div>
                         <label for="titre">Titre</label>
                         <input type="text" id="titre" name="titre" required>
@@ -122,9 +125,9 @@ modale2.innerHTML = `<p class="btn-fleche"><i class="fa-solid fa-arrow-left"></i
                                 <option class="none" selected></option>
                             </select>
                         </div>
-                     </form>
-                     <hr>
-                     <button class="btn-valider">valider</button>`;
+                        <hr>
+                        <button class="btn-valider">Valider</button>
+                     </form>`;
 
 open.addEventListener("click", () => {
     dialog.showModal();
@@ -154,6 +157,7 @@ retour.addEventListener("click", function () {
 });
 
 
+// affichage des photos
 for (let i=0; i < works.length; i++) {
     const imageElement = document.createElement("img");
     imageElement.src = works[i].imageUrl;
@@ -170,6 +174,7 @@ for (let i=0; i < works.length; i++) {
     figure.appendChild(poubelle);
     poubelle.appendChild(icone);
 }
+
 
 for (let i=0; i < works.length; i++) {
     const id = works[i].id;
@@ -191,13 +196,17 @@ for (let i=0; i < works.length; i++) {
 const reponseCat = await fetch("http://localhost:5678/api/categories");
 const categories = await reponseCat.json();
 
+const inputFile = document.querySelector("#photo");
+const inputText = document.querySelector("#titre");
+const select = document.querySelector("#categorie");
+const btnValider = document.querySelector(".btn-valider");
+
+
 function afficherCategorie(categories) {
     for (let i=0; i < categories.length; i++) {
         const nomElement = document.createElement("option");
         nomElement.innerText = categories[i].name;
         nomElement.value = categories[i].id;
-
-        const select = document.querySelector("#categorie");
         select.appendChild(nomElement);;
     }
 }
@@ -207,13 +216,14 @@ afficherCategorie(categories);
 
 function preview() {
     const inputFile = document.querySelector("#photo");
-    inputFile.addEventListener("change", () => {
+    inputFile.addEventListener("change", (event) => {
         const divPhoto = document.querySelector(".photo");
-        divPhoto.innerHTML = "";
+        const div = document.querySelector(".photo div");
+        div.setAttribute("style", "visibility: hidden;");
         const imagePreview = document.createElement("img");
         divPhoto.appendChild(imagePreview);
 
-        const url = "./assets/images/mitch-QhjgAniliuY-unsplash.jpg";
+        const url = URL.createObjectURL(event.target.files[0]);
         imagePreview.setAttribute("src", url);
         divPhoto.setAttribute("style", "width: 100%; height: 169px; padding: 0;");
         imagePreview.setAttribute("style", "height: 100%; width: auto;")
@@ -222,50 +232,52 @@ function preview() {
 preview();
 
 
+function desactiverBouton() {
+    if ((inputFile.files[0] === undefined) || (inputText.value === "") || (select.selectedIndex === 0)) {
+        btnValider.disabled = true;
+		console.log("bouton désactivé")
+	} else {
+		btnValider.disabled = false;
+		console.log("bouton activé")
+    }
+}
+desactiverBouton();
+
+inputFile.addEventListener("change", () => {
+    desactiverBouton();
+})
+
+inputText.addEventListener("blur", () => {
+	desactiverBouton();
+});
+
+select.addEventListener("change", () => {
+	desactiverBouton();
+});
+
+
 function validerAjoutPhoto() {
     const form = document.querySelector("dialog form");
-    const btnValider = document.querySelector(".btn-valider");
-    const inputText = document.querySelector("#titre");
-    const select = document.querySelector("#categorie");
-
-    if (inputText.value === "") {
-        btnValider.style.backgroundColor = "#A7A7A7";
-    }
-
-    inputText.addEventListener("change", () => {
-        btnValider.style.backgroundColor = "#1D6154";
-    })
-
-    const image = document.querySelector(".photo img");
-    const option = select.options[select.selectedIndex];
-    console.log(option);
     form.addEventListener("submit", async function(event) {
-        event.preventDefault;
-        const elForm = {
-            image: image.src,
-            title: inputText.value,
-            category: option.value
-        };
+        event.preventDefault();
+
+        const token = localStorage.getItem("token");
+        const formData = new FormData();
+        formData.append("image", inputFile.files[0]);
+        formData.append("title", inputText.value);
+        formData.append("category", select.options[select.selectedIndex].value);
+
         const res = await fetch("http://localhost:5678/api/works", {
             method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(elForm)
+            headers: {"Authorization": "Bearer " + token},
+            body: formData
         })
+
         if (res.ok === true) {
             console.log("Le projet a été ajouté")
         }
     })
 }
 
-// validerAjoutPhoto();
-
-
-// test
-const select = document.querySelector("#categorie");
-select.addEventListener("change", () => {
-    const option = select.options[select.selectedIndex];
-    console.log(option);
-    console.log(option.value);
-})
-
+validerAjoutPhoto();
 

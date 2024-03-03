@@ -136,7 +136,7 @@ li:hover {
 
 .gallery img {
 	width: 100%;
-
+	max-height: 491px;
 }
 #contact {
 	width: 50%;
@@ -337,6 +337,7 @@ h3{
 	padding: 10px 49px;
 	margin-top: 38px;
 	margin-bottom: 45px;
+	width: 237px;
 }
 
 .mini-photos{
@@ -349,8 +350,9 @@ h3{
 	position: relative;
 }
 
-dialog img{
+.modale img{
 	width: 77px;
+	max-height: 103px;
 }
 
 .btn-effacer{
@@ -446,6 +448,13 @@ select{
 	font-size: 10px;
 }
 
+.photo img{
+	z-index: 2;
+	position: relative;
+	top: -123px;
+	height: 169px;
+}
+
 #photo{
 	padding: 10px 33px;
 	margin-bottom: 7px;
@@ -465,3 +474,10 @@ label[for="photo"] {
 	border-radius: 60px;
 }
 
+.btn-valider{
+	align-self: center;
+}
+
+.btn-valider[disabled] {
+	background-color: #A7A7A7;
+}
