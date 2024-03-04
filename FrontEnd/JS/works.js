@@ -111,7 +111,7 @@ modale2.innerHTML = `<p class="btn-fleche"><i class="fa-solid fa-arrow-left"></i
                      <form>
                         <div class="photo">
                         <div>
-                            <i class="fa-regular fa-image fa-4x"></i>
+                            <i class="fa-regular fa-image fa-5x"></i>
                             <label for="photo">+ Ajouter photo</label>
                             <input type="file" id="photo" name="photo" accept=".png, .jpg" required>
                             <p>jpg, png : 4mo max</p>
@@ -157,57 +157,75 @@ retour.addEventListener("click", function () {
 });
 
 
-// affichage des photos
-for (let i=0; i < works.length; i++) {
-    const imageElement = document.createElement("img");
-    imageElement.src = works[i].imageUrl;
-    const figure = document.createElement("figure");
-
+// affichage des photos dans la modale
+function afficherMiniatures(works) {
     const miniatures = document.querySelector(".mini-photos");
-    miniatures.appendChild(figure);
-    figure.appendChild(imageElement);
+    miniatures.innerHTML = "";
+    for (let i=0; i < works.length; i++) {
+        const imageElement = document.createElement("img");
+        imageElement.src = works[i].imageUrl;
+        const figure = document.createElement("figure");
+        miniatures.appendChild(figure);
+        figure.appendChild(imageElement);
 
-    const poubelle = document.createElement("div");
-    poubelle.classList.add("btn-effacer");
-    const icone = document.createElement("i");
-    icone.classList.add("fa-solid", "fa-trash-can", "fa-border");
-    figure.appendChild(poubelle);
-    poubelle.appendChild(icone);
-}
+        const poubelle = document.createElement("div");
+        poubelle.classList.add("btn-effacer");
+        const icone = document.createElement("i");
+        icone.classList.add("fa-solid", "fa-trash-can", "fa-border");
+        figure.appendChild(poubelle);
+        poubelle.appendChild(icone);
 
-
-for (let i=0; i < works.length; i++) {
-    const id = works[i].id;
-    console.log(id);
-
-    function supprimerElement(id) {
-        return fetch('http://localhost:5678/api/works/' + id, {
-          method: 'DELETE',
-        })
-        .then(res => res.json())
-        .then(res => console.log(res))
+        const id = works[i].id;
+        poubelle.setAttribute("id", id);
     }
-    // supprimerElement(id);
 }
+afficherMiniatures(works);
+
+
+function supprimerProjet () {
+    const poubelles = document.querySelectorAll(".btn-effacer");
+    poubelles.forEach((poubelle) => {
+        poubelle.addEventListener("click", async (event) => {
+            event.preventDefault();
+            const id = poubelle.getAttribute("id");
+            console.log (id);
+            
+            const token = localStorage.getItem("token");
+            const res = await fetch('http://localhost:5678/api/works/' + id, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": "Bearer " + token
+                }
+            })
+            if (res.ok) {
+                const reponse = await fetch("http://localhost:5678/api/works");
+                const works = await reponse.json();
+                afficherMiniatures(works);
+                afficherProjets(works);           
+                console.log("Projet effacé");
+            }
+        })
+    })
+}
+supprimerProjet();
 
 
 // modale 2
-
-const reponseCat = await fetch("http://localhost:5678/api/categories");
-const categories = await reponseCat.json();
-
 const inputFile = document.querySelector("#photo");
 const inputText = document.querySelector("#titre");
 const select = document.querySelector("#categorie");
 const btnValider = document.querySelector(".btn-valider");
 
 
+const reponseCat = await fetch("http://localhost:5678/api/categories");
+const categories = await reponseCat.json();
+
 function afficherCategorie(categories) {
     for (let i=0; i < categories.length; i++) {
         const nomElement = document.createElement("option");
         nomElement.innerText = categories[i].name;
         nomElement.value = categories[i].id;
-        select.appendChild(nomElement);;
+        select.appendChild(nomElement);
     }
 }
 
@@ -274,7 +292,11 @@ function validerAjoutPhoto() {
         })
 
         if (res.ok === true) {
-            console.log("Le projet a été ajouté")
+            console.log("Le projet a été ajouté");
+            const reponse = await fetch("http://localhost:5678/api/works");
+            const works = await reponse.json();
+            afficherMiniatures(works);
+            afficherProjets(works);
         }
     })
 }
