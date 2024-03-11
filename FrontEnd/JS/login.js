@@ -11,18 +11,15 @@ form.addEventListener("submit", async function(event) {
         body: JSON.stringify(identifiantsConnexion)
     })
     if (res.ok === true) {
-        return res.json()
-        .then(data => {
-            localStorage.setItem("token", data.token);
-            window.location.href = "index.html";
-        })
+        const data = await res.json();
+        localStorage.setItem("token", data.token);
+        window.location.href = "index.html";
     } else {
         const button = document.querySelector(".btn-envoyer");
         const erreur = document.createElement("p");
-        erreur.setAttribute ("style", "text-align: center; margin-bottom: 15px; text-decoration: none;")
+        erreur.setAttribute ("style", "text-align: center; margin-bottom: 15px; text-decoration: none;");
         erreur.innerText = "Erreur dans l'identifiant ou le mot de passe";
         form.insertBefore(erreur, button);
         console.log("Erreur dans l'identifiant ou le mot de passe");
     }
 })
-
