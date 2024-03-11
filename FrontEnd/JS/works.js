@@ -1,5 +1,3 @@
-document.querySelector(".gallery").innerHTML = '';
-
 const reponse = await fetch("http://localhost:5678/api/works");
 const works = await reponse.json();
 
@@ -20,11 +18,23 @@ function afficherProjets(works) {
         projet.appendChild(nomElement);
     }
 }
-
 afficherProjets(works);
 
 
 // Mise en place des filtres
+const reponseCat = await fetch("http://localhost:5678/api/categories");
+const categories = await reponseCat.json();
+
+for (let i=0; i < categories.length; i++) {
+    const nomElement = document.createElement("li");
+    nomElement.innerText = categories[i].name;
+    nomElement.id = categories[i].id;
+    nomElement.classList.add("btn-filtres");
+    const ul = document.querySelector(".filter");
+    ul.appendChild(nomElement);
+}
+
+
 const boutonTous = document.querySelector(".btn-tous");
 boutonTous.addEventListener("click", function() {
     const projetsFiltres = works.filter(function(work) {
@@ -34,39 +44,22 @@ boutonTous.addEventListener("click", function() {
     afficherProjets(projetsFiltres);
 });
 
-const boutonObjets = document.querySelector(".btn-objets");
-boutonObjets.addEventListener("click", function() {
-    const projetsFiltres = works.filter(function(work) {
-        if (work.category.id === 1) {
-            return work;
-        };  
-    });
-    document.querySelector(".gallery").innerHTML = '';
-    afficherProjets(projetsFiltres);
-});
-
-const boutonApparts = document.querySelector(".btn-apparts");
-boutonApparts.addEventListener("click", function() {
-    const projetsFiltres = works.filter(function(work) {
-        if (work.category.id === 2) {
-            return work;
-        };  
-    });
-    document.querySelector(".gallery").innerHTML = '';
-    afficherProjets(projetsFiltres);
-});
-
-const boutonHotels = document.querySelector(".btn-hotels");
-boutonHotels.addEventListener("click", function() {
-    const projetsFiltres = works.filter(function(work) {
-        if (work.category.id === 3) {
-            return work;
-        };  
-    });
-    document.querySelector(".gallery").innerHTML = '';
-    afficherProjets(projetsFiltres);
-});
-
+function filtrer() {
+    const boutonsFiltres = document.querySelectorAll(".btn-filtres");
+    boutonsFiltres.forEach((bouton) => {
+        bouton.addEventListener("click", () => {
+            const boutonsId = bouton.getAttribute("id");
+            const projetsFiltres = works.filter(function(work) {
+                if (work.category.id == boutonsId) {
+                    return work;
+                }
+            })
+            document.querySelector(".gallery").innerHTML = '';
+            afficherProjets(projetsFiltres);
+        })    
+    })
+}
+filtrer();
 
 
 // Ajout des éléments du mode édition
@@ -74,8 +67,16 @@ boutonHotels.addEventListener("click", function() {
 function admin() {
     const bandeauEdition = document.querySelector(".edition");
     bandeauEdition.innerHTML = '<p><i class="fa-regular fa-pen-to-square"></i>Mode édition</p>';
+    const header = document.querySelector("header");
+    header.setAttribute("style", "margin-top: 97px;");
     const boutonModifier = document.querySelector(".btn-modifier");
     boutonModifier.innerHTML = '<i class="fa-regular fa-pen-to-square"></i>modifier';
+    
+    const filtres = document.querySelector(".filter");
+    filtres.setAttribute("style", "display: none;");
+    const h2 = document.querySelector("#portfolio h2");
+    h2.setAttribute("style", "margin-bottom: 92px;");
+    
     const logout = document.querySelector(".logout");
     logout.innerHTML = "logout";
 
@@ -110,11 +111,11 @@ modale2.innerHTML = `<p class="btn-fleche"><i class="fa-solid fa-arrow-left"></i
                      <h3>Ajout photo</h3>
                      <form>
                         <div class="photo">
-                        <div>
-                            <i class="fa-regular fa-image fa-5x"></i>
-                            <label for="photo">+ Ajouter photo</label>
-                            <input type="file" id="photo" name="photo" accept=".png, .jpg" required>
-                            <p>jpg, png : 4mo max</p>
+                            <div>
+                                <i class="fa-regular fa-image fa-5x"></i>
+                                <label for="photo">+ Ajouter photo</label>
+                                <input type="file" id="photo" name="photo" accept=".png, .jpg" required>
+                                <p>jpg, png : 4mo max</p>
                             </div>
                         </div>
                         <label for="titre">Titre</label>
@@ -158,6 +159,7 @@ retour.addEventListener("click", function () {
 
 
 // affichage des photos dans la modale
+
 function afficherMiniatures(works) {
     const miniatures = document.querySelector(".mini-photos");
     miniatures.innerHTML = "";
@@ -188,7 +190,6 @@ function supprimerProjet () {
         poubelle.addEventListener("click", async (event) => {
             event.preventDefault();
             const id = poubelle.getAttribute("id");
-            console.log (id);
             
             const token = localStorage.getItem("token");
             const res = await fetch('http://localhost:5678/api/works/' + id, {
@@ -201,6 +202,7 @@ function supprimerProjet () {
                 const reponse = await fetch("http://localhost:5678/api/works");
                 const works = await reponse.json();
                 afficherMiniatures(works);
+                supprimerProjet();
                 afficherProjets(works);           
                 console.log("Projet effacé");
             }
@@ -210,15 +212,14 @@ function supprimerProjet () {
 supprimerProjet();
 
 
-// modale 2
+
+// fonctions de la modale 2
+
 const inputFile = document.querySelector("#photo");
 const inputText = document.querySelector("#titre");
 const select = document.querySelector("#categorie");
 const btnValider = document.querySelector(".btn-valider");
 
-
-const reponseCat = await fetch("http://localhost:5678/api/categories");
-const categories = await reponseCat.json();
 
 function afficherCategorie(categories) {
     for (let i=0; i < categories.length; i++) {
@@ -228,7 +229,6 @@ function afficherCategorie(categories) {
         select.appendChild(nomElement);
     }
 }
-
 afficherCategorie(categories);
 
 
@@ -244,7 +244,6 @@ function preview() {
         const url = URL.createObjectURL(event.target.files[0]);
         imagePreview.setAttribute("src", url);
         divPhoto.setAttribute("style", "width: 100%; height: 169px; padding: 0;");
-        imagePreview.setAttribute("style", "height: 100%; width: auto;")
     })
 }
 preview();
@@ -253,10 +252,9 @@ preview();
 function desactiverBouton() {
     if ((inputFile.files[0] === undefined) || (inputText.value === "") || (select.selectedIndex === 0)) {
         btnValider.disabled = true;
-		console.log("bouton désactivé")
 	} else {
 		btnValider.disabled = false;
-		console.log("bouton activé")
+		console.log("bouton activé");
     }
 }
 desactiverBouton();
@@ -296,10 +294,16 @@ function validerAjoutPhoto() {
             const reponse = await fetch("http://localhost:5678/api/works");
             const works = await reponse.json();
             afficherMiniatures(works);
+            supprimerProjet();
             afficherProjets(works);
+
+            form.reset();
+            const div = document.querySelector(".photo div");
+            div.setAttribute("style", "visibility: visible;");
+            const preview = document.querySelector(".photo img");
+            preview.remove();
+            desactiverBouton();
         }
     })
 }
-
 validerAjoutPhoto();
-
